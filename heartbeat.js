@@ -15,15 +15,18 @@
     'use strict';  
 
     // LOCATION_HASH #tiktakgames ile başlamıyorsa çalıştırma
-    if (!window.location.hash.includes("#tiktakgames")) { 
-        console.log("TikTok Live Heartbeat is not started because it's not started with #tiktakgames");
-        return;
-    }
+    // if (!window.location.hash.includes("#tiktakgames")) { 
+    //     console.log("TikTok Live Heartbeat is not started because it's not started with #tiktakgames");
+    //     return;
+    // }
 
     const BASE_URL = window.location.href; 
 
 
     class Log {
+        // put here static queue
+        static queue = [];
+
         static success(message) {
             Log.createLog(message, 'success');
         }
@@ -75,6 +78,16 @@
         
 
         static createLog(message, type) {
+            if(!document.body ){
+                Log.queue.push({ message, type });
+                return;
+            }
+            if(Log.queue.length > 0) {
+                Log.queue.forEach(log => {
+                    Log.createLog(log.message, log.type);
+                });
+                Log.queue = [];
+            }
             const logContainer = Log.getLogContainer();
           
             const logElement = document.createElement('div'); 
@@ -125,10 +138,7 @@
         PAGE_INFO_DETECTED = false;
 
         run = () => {
-            Log.success("TikTok Live Heartbeat started!");
-
-            // owerwrite native functions
-            this.middleware();
+            Log.success("TikTok Live Heartbeat started!"); 
  
             // run detectRoomInfo every 1 second until it's detected
             const interval = setInterval(() => {
@@ -140,9 +150,8 @@
             }, 1000);
         }
 
-        middleware = () => {
-            // save native functions
-            Log.log("Middleware started!");
+        overrideNativeFunctions = () => { 
+            Log.log("Saving native XMLHttpRequest.open, WebSocket and Response.json functions...");
             let _XMLHttpRequestOpen = window.XMLHttpRequest.prototype.open;
             let _WebSocket = window.WebSocket;
             let _ResponseJson = window.Response.prototype.json;
@@ -152,7 +161,7 @@
             // override XMLHttpRequest.open function
             Log.log("Overriding XMLHttpRequest.open, WebSocket and Response.json functions...");
             window.XMLHttpRequest.prototype.open = function (method, url) {
-                if (url && url.includes('/webcast/im/fetch') && url.includes(roomId) && url.includes('msToken')) {
+                if (url && url.includes('/webcast/im/fetch') && url.includes(this.ROOM_ID) && url.includes('msToken')) {
                     this.addEventListener('readystatechange', () => {
                         if (this.readyState === 4) {
                             console.log(this.response)
@@ -166,9 +175,9 @@
             // override WebSocket function
             Log.log("Overriding WebSocket function...");
             window.WebSocket = function (url, protocols) {
-                let ws = new (Function.prototype.bind.call(_WebSocket, null, url, protocols))();
+                let ws = new (Function.prototype.bind.call(_WebSocket, null, url, protocols));
 
-                if (url && url.includes('/webcast/im/') && url.includes(roomId)) {
+                if (url && url.includes('/webcast/im/') && url.includes(this.ROOM_ID)) {
                     ws.addEventListener('message', function (msg) {
                         console.log(msg.data);
                     })
@@ -331,7 +340,8 @@
   
     }
 
-    const heartbeat = new TikTokLiveHeartbeat();
+    const heartbeat = new TikTokLiveHeartbeat(); 
+    heartbeat.overrideNativeFunctions();
 
     if(document.body) {
         heartbeat.run();
