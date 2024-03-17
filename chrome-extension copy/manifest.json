@@ -1,0 +1,26 @@
+{
+    "name": "TiktakGamesAgent",
+    "version": "1.0",
+    "description": "TiktakGames Heartbeat Agent",
+    "manifest_version": 2,
+
+    "background": { 
+        "scripts": [ 
+            "lib/stomp.min.js",
+            "background.js"
+        ]
+    },
+    "content_scripts": [{
+        "matches": ["<all_urls>"],
+        "js": [
+            "lib/log.js",
+            "lib/stomp.min.js",
+            "content.js"
+        ]
+    }],
+    "permissions": [
+        "activeTab",
+        "tabs",
+        "webNavigation" 
+    ] 
+}
