@@ -1,5 +1,5 @@
 { 
-    "manifest_version": 3,
+    "manifest_version": 2,
     "name": "TiktakGamesAgent",
     "version": "1.0",
     "description": "TiktakGames Heartbeat Agent",
@@ -13,15 +13,24 @@
         "default_title": "Chrome Addon v3 Starter",
         "default_popup": "popup/popup.html"
     },
-    "permissions": [],
-    "host_permissions": [
+    "permissions": [
+        "declarativeNetRequest",
+        "declarativeNetRequestFeedback",
+        "webRequest",
+        "webRequestBlocking",
+        "*://*/*"
+    ],
+    "host_permissions": [ 
         "*://*/*"
     ],
     "background": {
-        "service_worker": "service-worker.js"
+        "service_worker": "service-worker.js",
+        "persistent": false
     },
     "content_scripts": [{
         "js": ["foreground.js"],
-        "matches": ["https://www.tiktok.com/*"]
+        "css": ["foreground.css"],
+        "matches": ["https://www.tiktok.com/@*/live"],
+        "run_at": "document_start"
     }]
 }
