@@ -1,6 +1,8 @@
 (function () {
     'use strict';   
 
+
+
     // url hask #tiktakgames|550e8400-e29b-41d4-a716-446655440000|f005d178-94f8-4091-bf48-0cee83bbf39f gibi olmalı. tag|ACCOUNT_UUID|GAME_UUID
     const urlHash = window.location.hash;
  
@@ -128,72 +130,72 @@
 
     Log.success("TikTok Live Heartbeat started!"); 
     
-    Log.log("Saving native XMLHttpRequest.open, WebSocket and Response.json functions...");
-    let _XMLHttpRequestOpen = window.XMLHttpRequest.prototype.open;
-    let _WebSocket = window.WebSocket;
-    let _ResponseJson = window.Response.prototype.json;
-    let _fetch = window.fetch;
-    Log.info("Native XMLHttpRequest.open, WebSocket and Response.json functions are saved!");
+    // Log.log("Saving native XMLHttpRequest.open, WebSocket and Response.json functions...");
+    // let _XMLHttpRequestOpen = window.XMLHttpRequest.prototype.open;
+    // let _WebSocket = window.WebSocket;
+    // let _ResponseJson = window.Response.prototype.json;
+    // let _fetch = window.fetch;
+    // Log.info("Native XMLHttpRequest.open, WebSocket and Response.json functions are saved!");
 
-    // override native functions
-    // override XMLHttpRequest.open function
-    Log.log("Overriding XMLHttpRequest.open, WebSocket and Response.json functions...");
-    window.XMLHttpRequest.prototype.open = function (method, url) {
-        if (url && url.includes('/webcast/im/fetch') && url.includes(ROOM_ID) && url.includes('msToken')) {
-            this.addEventListener('readystatechange', () => {
-                if (this.readyState === 4) {
-                    console.log(this.response)
-                }
-            })
-        } 
-        return _XMLHttpRequestOpen.apply(this, arguments);
-    }
-    Log.success("XMLHttpRequest.open function is overridden!");
+    // // override native functions
+    // // override XMLHttpRequest.open function
+    // Log.log("Overriding XMLHttpRequest.open, WebSocket and Response.json functions...");
+    // window.XMLHttpRequest.prototype.open = function (method, url) {
+    //     if (url && url.includes('/webcast/im/fetch') && url.includes(ROOM_ID) && url.includes('msToken')) {
+    //         this.addEventListener('readystatechange', () => {
+    //             if (this.readyState === 4) {
+    //                 console.log(this.response)
+    //             }
+    //         })
+    //     } 
+    //     return _XMLHttpRequestOpen.apply(this, arguments);
+    // }
+    // Log.success("XMLHttpRequest.open function is overridden!");
 
-    // override WebSocket function
-    Log.log("Overriding WebSocket function...");
-    window.WebSocket = function (url, protocols) {
-        Log.info("WebSocket function is called!");
-        Log.log("URL: " + url);
-        let ws = new (Function.prototype.bind.call(_WebSocket, null, url, protocols));
+    // // override WebSocket function
+    // Log.log("Overriding WebSocket function...");
+    // window.WebSocket = function (url, protocols) {
+    //     Log.info("WebSocket function is called!");
+    //     Log.log("URL: " + url);
+    //     let ws = new (Function.prototype.bind.call(_WebSocket, null, url, protocols));
 
-        if (url && url.includes('/webcast/im/') && url.includes(ROOM_ID)) {
-            ws.addEventListener('message', function (msg) {  
-                console.log(msg)
-                Log.success("WebSocket message received! " + msg.data.byteLength + " bytes");
-            })
+    //     if (url && url.includes('/webcast/im/') && url.includes(ROOM_ID)) {
+    //         ws.addEventListener('message', function (msg) {  
+    //             console.log(msg)
+    //             Log.success("WebSocket message received! " + msg.data.byteLength + " bytes");
+    //         })
 
-            ws.addEventListener('close', () => {
-                Log.warning("WebSocket closed!"); 
-                LIVE_ENDED = true;
-            })
-        }
+    //         ws.addEventListener('close', () => {
+    //             Log.warning("WebSocket closed!"); 
+    //             LIVE_ENDED = true;
+    //         })
+    //     }
 
-        return ws;
-    }
-    Log.success("WebSocket function is overridden!");
+    //     return ws;
+    // }
+    // Log.success("WebSocket function is overridden!");
 
-    // override Response.json function
-    Log.log("Overriding Response.json function...");
-    window.Response.prototype.json = function () {
-        return new Promise((resolve, reject) => {
-            _ResponseJson.apply(this).then(json => {
-                resolve(json);
+    // // override Response.json function
+    // Log.log("Overriding Response.json function...");
+    // window.Response.prototype.json = function () {
+    //     return new Promise((resolve, reject) => {
+    //         _ResponseJson.apply(this).then(json => {
+    //             resolve(json);
 
-                if (json?.data?.liveRoom?.streamId && !roomInfoProcessed) {
-                    roomInfoProcessed = true;
-                    roomId = json?.data?.user?.roomId || "unknown";
+    //             if (json?.data?.liveRoom?.streamId && !roomInfoProcessed) {
+    //                 roomInfoProcessed = true;
+    //                 roomId = json?.data?.user?.roomId || "unknown";
 
-                    if (roomId === "unknown") {
-                        console.log("roomId not detected!");
-                    }
+    //                 if (roomId === "unknown") {
+    //                     console.log("roomId not detected!");
+    //                 }
 
-                    console.log('roomInfo', { liveRoomUserInfo: json.data, liveRoomStatus: json.data.liveRoom?.status });
-                }
-            }).catch(reject);
-        })
-    };
-    Log.success("Response.json function is overridden!");
+    //                 console.log('roomInfo', { liveRoomUserInfo: json.data, liveRoomStatus: json.data.liveRoom?.status });
+    //             }
+    //         }).catch(reject);
+    //     })
+    // };
+    // Log.success("Response.json function is overridden!");
 
  
 
@@ -381,19 +383,70 @@
 
 })();
 
+ 
+ 
+// listen TIKTAKGAMES_HOOK_WEBSOCKET message
+window.addEventListener('message', function (event) {
+    if (event.data.from === 'TIKTAKGAMES_HOOK_WEBSOCKET') {
+        let url = event.data.data.url;
+        // eğer url ws ile başlamıyorsa çık
+        if (!url.startsWith('ws')) return;
+        // eğer url içinde /webcast/im/ yoksa çık
+        if (!url.includes('/webcast/im/')) return;
+        // eğer url içinde ROOM_ID yoksa çık
+        console.log('HOOK_WEBSOCKET_URL', url);
+        console.log('HOOK_WEBSOCKET_COOKIES', event.data.data.cookies);
+        console.log(event.data.data);
 
-(function() {
-    // Orijinal WebSocket nesnesini saklama
-    var OriginalWebSocket = window.WebSocket;
-  
-    // Yeni WebSocket oluşturma
-    function NewWebSocket(url, protocols) {
-      console.log("WebSocket isteği yapıldı. URL:", url);
-      // İstediğiniz herhangi bir işlemi yapabilirsiniz.
-      // Burada sadece orijinal WebSocket'i çağırıyoruz.
-      return new OriginalWebSocket(url, protocols);
     }
-  
-    // window.WebSocket'i değiştirme
-    window.WebSocket = NewWebSocket;
-  })();
+});
+
+
+function injectScript(file, node) {
+    var th = document.getElementsByTagName(node)[0];
+    var s = document.createElement('script');
+    s.setAttribute('type', 'text/javascript');
+    s.setAttribute('src', file);
+    th.appendChild(s);
+}
+injectScript( chrome.extension.getURL('/web_accessible_resources.js'), 'body');
+
+ 
+ 
+    // console.log('DOM yüklendi');
+    // const nativeWebSocket = document.defaultView.WebSocket; 
+    // document.defaultView.window.WebSocket = function(url, protocols) {
+    //     // Gelen WebSocket isteğini konsola yazdırın
+    //     console.log('WebSocket:', url, protocols);
+        
+    //     // Yeni WebSocket nesnesi oluşturun
+    //     const ws = new nativeWebSocket(url, protocols);
+        
+    //     // WebSocket üzerinde 'message' olayını dinleyin
+    //     ws.addEventListener('message', function(event) {
+    //         console.log('Message:', event.data);
+    //     });
+        
+    //     // Oluşturulan WebSocket nesnesini geri döndürün
+    //     return ws;
+    // }; 
+ 
+
+// document.defaultView.OverwritedWebSocket = function(url, protocols) {
+//     console.log('WebSocket:', url, protocols);
+//     const ws = new nativeWebSocket(url, protocols);
+//     ws.addEventListener('message', function(event) {
+//         console.log('Message:', event.data);
+//     });
+//     return ws;
+// }
+
+// const code = `
+// const nativeWebSocket = window.WebSocket; 
+// window.WebSocket = OverwritedWebSocket;
+// `
+// const script = document.createElement('script');
+// script.textContent = code;
+// (document.head||document.documentElement).appendChild(script);
+
+// script.remove();

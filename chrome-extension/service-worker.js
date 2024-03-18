@@ -501,27 +501,4 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         }
     }
 });
-
-// sadece web requestlerin urllerini almak için
-chrome.webRequest.onBeforeRequest.addListener((details) => {
-    // URL'yi ayıkla
-    const url = new URL(details.url);
-
-    // WebSocket isteğini kontrol et
-    if (url.protocol === "ws:" || url.protocol === "wss:") {
-        console.log("WebSocket isteği:", details.url);
-    } else {
-        console.log("HTTP isteği:", details.url);
-    }
-}, {
-    urls: ["<all_urls>"],
-    types: ["xmlhttprequest", "websocket"]
-});
-// web socket bağlantıları için
-chrome.webRequest.onBeforeRequest.addListener((details) => {
-    console.log("Request URL: ", details.url);
-}, {
-    urls: ["<all_urls>"]
-});
-
  
