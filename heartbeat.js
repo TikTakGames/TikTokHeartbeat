@@ -433,10 +433,10 @@
             let xml = `<?xml version="1.0" encoding="utf-16"?>
             <package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
                 <type>Heartbeat</type>
+                <game_uuid>${GAME_UUID}</game_uuid>
+                <account_uuid>${ACCOUNT_UUID}</account_uuid>
+                <account_identity>${STREAMER_USERNAME}</account_identity>
                 <heartbeat>
-                    <account_uuid>${ACCOUNT_UUID}</account_uuid>
-                    <game_uuid>${GAME_UUID}</game_uuid>
-                    <streamer_username>${STREAMER_USERNAME}</streamer_username>
                     <stream_id>${ROOM_ID}</stream_id>
                 </heartbeat>
             </package>`; 
