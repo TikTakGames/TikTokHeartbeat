@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TikTok Live Heartbeat
 // @namespace    https://tiktakgames.com.tr/
-// @version      1.2.2
+// @version      1.2.4
 // @description  Script to send heartbeat to TikTok live streams to keep them alive
 // @author       TikTakGames
 // @match        https://www.tiktok.com/*/live
@@ -448,7 +448,7 @@
                     addSuccessLog(getTranslate("heartbeat_sent"));
                 }
             }); 
-        }, 1000);
+        }, 15000);
     }
 
     function checkLiveEnd() {
