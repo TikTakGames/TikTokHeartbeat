@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name         TikTok Live Heartbeat
 // @namespace    https://tiktakgames.com.tr/
-// @version      1.1
+// @version      1.2.2
 // @description  Script to send heartbeat to TikTok live streams to keep them alive
 // @author       TikTakGames
 // @match        https://www.tiktok.com/*/live
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=tiktok.com
+// @license      MIT
 // @grant        GM_xmlhttpRequest
 // @run-at       document-start
 // ==/UserScript==
@@ -25,9 +26,9 @@
     const hashParts = urlHash.split('|');
     if(hashParts.length < 3) return;
     
-    const TAG = hashParts[1];
-    const ACCOUNT_UUID = hashParts[2];
-    const GAME_UUID = hashParts[3];
+    const TAG = hashParts[0];
+    const ACCOUNT_UUID = hashParts[1];
+    const GAME_UUID = hashParts[2];
 
     // tarayıcnın userAgent'ini alıyoruz.
     const USER_AGENT = navigator.userAgent; 
@@ -435,9 +436,8 @@
                 <heartbeat>
                     <account_uuid>${ACCOUNT_UUID}</account_uuid>
                     <game_uuid>${GAME_UUID}</game_uuid>
-                    <streamer_username>${STREAMER_USERNAME}</streamer_username>  
-                    <stream_id>${ROOM_ID}</stream_id>  
-                    <content><![CDATA[${PAGE_INFO}]]></page_info>
+                    <streamer_username>${STREAMER_USERNAME}</streamer_username>
+                    <stream_id>${ROOM_ID}</stream_id>
                 </heartbeat>
             </package>`; 
             GM_xmlhttpRequest({
