@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TikTok Live Heartbeat
 // @namespace    https://tiktakgames.com.tr/
-// @version      1.2.4
+// @version      1.2.5
 // @description  Script to send heartbeat to TikTok live streams to keep them alive
 // @author       TikTakGames
 // @match        https://www.tiktok.com/*/live
