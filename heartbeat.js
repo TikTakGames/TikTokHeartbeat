@@ -436,13 +436,14 @@
                 <game_uuid>${GAME_UUID}</game_uuid>
                 <account_uuid>${ACCOUNT_UUID}</account_uuid>
                 <account_identity>${STREAMER_USERNAME}</account_identity>
+                <platform_id>1</platform_id>
                 <heartbeat>
                     <stream_id>${ROOM_ID}</stream_id>
                 </heartbeat>
             </package>`; 
             GM_xmlhttpRequest({
                 method: "POST",
-                url: "https://panel.tiktakgames.com.tr/heartbeat",
+                url: "https://panel.tiktakgames.com.tr/service/heartbeat",
                 data: xml,
                 onload: function(response) {
                     addSuccessLog(getTranslate("heartbeat_sent"));
